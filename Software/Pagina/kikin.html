@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Detección de Fugas de Gas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos generales */
+        :root {
+            --primary: #0078d7;
+            --secondary: #005bb5;
+            --accent: #ff6b00;
+            --light: #f4f4f4;
+            --dark: #333;
+            --danger: #e74c3c;
+            --success: #28a745;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        /* Header y navegación */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 2rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .dashboard-btn {
+            background-color: var(--accent);
+            color: white;
+            border-radius: 4px;
+        }
+        
+        .dashboard-btn:hover {
+            background-color: #e05d00;
+        }
+        
+        /* Hero section */
+        .hero {
+            background: url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            color: white;
+            text-align: center;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            padding: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            background-color: #e05d00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Secciones */
+        section {
+            padding: 4rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background-color: var(--accent);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* Problemática */
+        .problematica {
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .problematica h3 {
+            color: var(--danger);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        /* Objetivo */
+        .objetivo {
+            background-color: #f0f8ff;
+            border-left: 4px solid var(--primary);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .objetivo h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        /* Justificación */
+        .justificacion {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--success);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 4px;
+        }
+        
+        .justificacion h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .justificacion ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            list-style-type: none;
+        }
+        
+        .justificacion ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Arquitectura */
+        .arquitectura {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .arquitectura h3 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .etapas {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .etapa {
+            flex: 1 1 300px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .etapa:hover {
+            transform: translateY(-5px);
+        }
+        
+        .etapa::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--primary);
+        }
+        
+        .etapa h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .etapa p {
+            margin-bottom: 1rem;
+        }
+        
+        /* Protocolos */
+        .protocolos {
+            margin-top: 3rem;
+        }
+        
+        .protocolos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .protocolo-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .protocolo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .protocolo-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .protocolo-card h4 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Hardware */
+        .hardware {
+            background-color: #f9f9f9;
+        }
+        
+        .hardware-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .hardware-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .hardware-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .hardware-img {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .hardware-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .hardware-card:hover .hardware-img img {
+            transform: scale(1.05);
+        }
+        
+        .hardware-content {
+            padding: 1.5rem;
+        }
+        
+        .hardware-content h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .hardware-content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hardware-content a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .hardware-content a i {
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .hardware-content a:hover i {
+            transform: translateX(3px);
+        }
+        
+        /* Sensores */
+        .sensores {
+            margin-top: 3rem;
+        }
+        
+        .sensor-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .sensor-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .sensor-img {
+            flex: 1 1 300px;
+            max-width: 400px;
+        }
+        
+        .sensor-img img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .sensor-details {
+            flex: 1 1 300px;
+        }
+        
+        .sensor-details h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .sensor-details ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Integrantes */
+        .integrantes {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+        }
+        
+        .integrantes .section-title h2 {
+            color: white;
+        }
+        
+        .integrantes .section-title h2::after {
+            background-color: var(--accent);
+        }
+        
+        .equipo {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .integrante {
+            background-color: white;
+            color: var(--dark);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            flex: 1 1 200px;
+            max-width: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        .integrante:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .integrante-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .integrante h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 3rem 0 1rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section {
+            flex: 1 1 300px;
+            text-align: left;
+        }
+        
+        .footer-section h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-links a {
+            color: white;
+            background-color: var(--primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            border-top: 1px solid #444;
+            padding-top: 1rem;
+            margin-top: 2rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .etapas {
+                flex-direction: column;
+            }
+            
+            .sensor-info {
+                flex-direction: column;
+            }
+            
+            .sensor-img {
+                max-width: 100%;
+            }
+        }
+        
+        /* Animaciones */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-fire-extinguisher"></i>
+                    <span>SafeGas</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#problematica">Problemática</a></li>
+                    <li><a href="#objetivo">Objetivo</a></li>
+                    <li><a href="#justificacion">Justificación</a></li>
+                    <li><a href="#arquitectura">Arquitectura</a></li>
+                    <li><a href="#hardware">Hardware</a></li>
+                    <li><a href="#sensores">Sensores</a></li>
+                    <li><a href="#integrantes">Integrantes</a></li>
+                    <li><a href="historicos.html" class="dashboard-btn"><i class="fas fa-database"></i> Datos Históricos</a></li>
+                    <li><a href="loguin.html" class="dashboard-btn">Dashboard <i class="fas fa-external-link-alt"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Prototipo de Detección de Fugas de Gas</h1>
+            <p>Tecnologías inalámbricas LoRa y 4G para prevenir accidentes y proteger vidas</p>
+            <a href="https://drive.google.com/file/d/1YEkbA6KWxJU_BiygfIiQAhTBjIceq5aF/view?usp=sharing" class="btn pulse" target="_blank">Conoce más</a>
+        </div>
+    </section>
+
+    <!-- Problemática -->
+    <section id="problematica" class="container">
+        <div class="section-title">
+            <h2>Problemática</h2>
+        </div>
+        <div class="problematica">
+            <h3><i class="fas fa-exclamation-triangle"></i> Riesgo en viviendas</h3>
+            <p style="text-align: justify;">En las viviendas de la localidad de Mixquiahuala de Juárez, las fugas de gas LP representan un riesgo latente y grave para la seguridad de los habitantes y la integridad de las propiedades. La acumulación inadvertida de gas debido a conexiones defectuosas, deterioro de las tuberías o instalaciones inadecuadas puede desencadenar explosiones, incendios y la emisión de agentes tóxicos.</p>
+            <p style="text-align: justify;">La detección tardía o la ausencia de monitoreo dificultan la intervención oportuna, aumentando la probabilidad de incidentes críticos y la exposición prolongada a contaminantes. Además, en muchos casos, la falta de una infraestructura tecnológica adecuada limita la capacidad de las autoridades y de los propios residentes para responder de forma rápida y eficaz a estas emergencias.</p>
+        </div>
+    </section>
+
+    <!-- Objetivo -->
+    <section id="objetivo" class="container">
+        <div class="section-title">
+            <h2>Objetivo</h2>
+        </div>
+        <div class="objetivo">
+            <h3><i class="fas fa-bullseye"></i> Nuestra meta</h3>
+            <p style="text-align: justify;">Desarrollar e implementar un sistema de detección de fugas de gas LP en viviendas, para prevenir accidentes y reducir el riesgo de incendios o explosiones, utilizando sensores con tecnologías de comunicación inalámbrica LoRa y 4G.</p>
+            <p style="text-align: justify;">El sistema permitirá el monitoreo en tiempo real de los niveles de gas, presión y temperatura, enviando alertas inmediatas cuando se detecten concentraciones peligrosas, brindando así mayor seguridad a los habitantes.</p>
+        </div>
+    </section>
+
+    <!-- Justificación -->
+    <section id="justificacion" class="container">
+        <div class="section-title">
+            <h2>Justificación</h2>
+        </div>
+        <div class="justificacion">
+            <h3><i class="fas fa-check-circle"></i> Relevancia del proyecto</h3>
+            <p style="text-align: justify;">
+                La investigación sobre la implementación de un sistema de detección de gas LP en los hogares de Mixquiahuala es fundamental debido a la creciente preocupación por la seguridad de los habitantes en relación con el uso de este recurso energético. La falta de sistemas eficaces para detectar fugas ha provocado un aumento en incidentes que amenazan vidas y generan daños materiales significativos. Por ello, abordar este problema es esencial para garantizar un entorno más seguro y saludable en la comunidad.
+            </p>
+            
+            <h4 style="color: var(--success); margin-top: 1.5rem; margin-bottom: 1rem;">Este proyecto se justifica por su capacidad para:</h4>
+            
+            <ul>
+                <li>
+                    <i class="fas fa-shield-alt" style="color: var(--success); margin-right: 0.5rem;"></i>
+                    <strong>Mejorar la seguridad y el bienestar social</strong>, previniendo accidentes como explosiones e intoxicaciones.
+                </li>
+                <li>
+                    <i class="fas fa-microchip" style="color: var(--success); margin-right: 0.5rem;"></i>
+                    <strong>Promover la innovación tecnológica</strong>, mediante el desarrollo de soluciones basadas en tecnologías emergentes.
+                </li>
+                <li>
+                    <i class="fas fa-book" style="color: var(--success); margin-right: 0.5rem;"></i>
+                    <strong>Fomentar una cultura de prevención</strong>, educando a la comunidad sobre los riesgos del gas LP.
+                </li>
+                <li>
+                    <i class="fas fa-chart-line" style="color: var(--success); margin-right: 0.5rem;"></i>
+                    <strong>Generar beneficios económicos</strong>, al reducir costos por daños y crear oportunidades de empleo local.
+                </li>
+                <li>
+                    <i class="fas fa-leaf" style="color: var(--success); margin-right: 0.5rem;"></i>
+                    <strong>Proteger el medio ambiente</strong>, minimizando emisiones y riesgos de incendios.
+                </li>
+            </ul>
+            
+            <p style="text-align: justify; margin-top: 1.5rem;">
+                En el ámbito social, la detección temprana de fugas previene tragedias y reduce pérdidas materiales. Desde la perspectiva tecnológica, el proyecto impulsa la investigación y el desarrollo de prototipos innovadores. En el plano ético, refleja un compromiso con la seguridad y la educación ciudadana. Económicamente, promueve el ahorro y el desarrollo local, mientras que, en el aspecto ambiental, contribuye a la sostenibilidad al reducir emisiones contaminantes.
+            </p>
+        </div>
+    </section>
+
+    <!-- Arquitectura del Sistema -->
+    <section id="arquitectura" class="container">
+        <div class="section-title">
+            <h2>Arquitectura del Sistema</h2>
+        </div>
+        <div class="arquitectura">
+            <h3>Sistema integral de detección y monitoreo</h3>
+            <p style="text-align: justify;">El sistema está diseñado para capturar datos de sensores, transmitirlos a través de distintas tecnologías de comunicación, y finalmente visualizarlos en un entorno de monitoreo en línea.</p>
+            
+            <div class="etapas">
+                <div class="etapa">
+                    <h4><i class="fas fa-microchip"></i> Arduino Uno</h4>
+                    <p style="text-align: justify;">Realiza la lectura de tres sensores (gas, temperatura y presión). Los datos recolectados se agrupan en un objeto JSON y se transmiten mediante el protocolo UART hacia una placa Heltec LoRa 32 V3.</p>
+                </div>
+                
+                <div class="etapa">
+                    <h4><i class="fas fa-wifi"></i> Heltec LoRa 32 V3 - Nodo 1</h4>
+                    <p style="text-align: justify;">Recibe el JSON a través de UART, muestra los datos en su pantalla OLED integrada, y luego utiliza LoRa para enviarlos de forma inalámbrica a un segundo nodo Heltec.</p>
+                </div>
+                
+                <div class="etapa">
+                    <h4><i class="fas fa-exchange-alt"></i> Heltec LoRa 32 V3 - Nodo 2</h4>
+                    <p style="text-align: justify;">Recibe los datos vía LoRa, los visualiza en su pantalla OLED y los retransmite utilizando ESP-NOW, un protocolo inalámbrico de baja latencia entre dispositivos ESP32.</p>
+                </div>
+                
+                <div class="etapa">
+                    <h4><i class="fas fa-signal"></i> LilyGO TTGO SIM7600</h4>
+                    <p style="text-align: justify;">Recibe el JSON mediante ESP-NOW y se conecta a una red móvil 4G a través de su módem SIM7600. Utilizando el protocolo MQTT, envía el JSON a un broker público en la nube.</p>
+                </div>
+                
+                <div class="etapa">
+                    <h4><i class="fas fa-tv"></i> Node-RED</h4>
+                    <p style="text-align: justify;">Mediante conexión al broker MQTT, recibe los datos transmitidos y los representa visualmente a través de dashboards personalizados para el usuario final.</p>
+                </div>
+            </div>
+            
+            <div class="protocolos">
+                <h3><i class="fas fa-network-wired"></i> Protocolos de Comunicación Utilizados</h3>
+                
+                <div class="protocolos-grid">
+                    <div class="protocolo-card">
+                        <div class="protocolo-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <h4>UART</h4>
+                        <p style="text-align: justify;">Protocolo serial básico para transmitir datos entre el Arduino y la primera Heltec mediante líneas físicas TX y RX.</p>
+                    </div>
+                    
+                    <div class="protocolo-card">
+                        <div class="protocolo-icon">
+                            <i class="fas fa-broadcast-tower"></i>
+                        </div>
+                        <h4>LoRa</h4>
+                        <p style="text-align: justify;">Comunicación inalámbrica de largo alcance y bajo consumo, adecuada para transmitir datos entre los dos nodos Heltec.</p>
+                    </div>
+                    
+                    <div class="protocolo-card">
+                        <div class="protocolo-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h4>ESP-NOW</h4>
+                        <p style="text-align: justify;">Protocolo de comunicación directa y rápida entre dispositivos ESP32, utilizado para transferir datos desde el segundo Heltec a la LilyGO.</p>
+                    </div>
+                    
+                    <div class="protocolo-card">
+                        <div class="protocolo-icon">
+                            <i class="fas fa-cloud"></i>
+                        </div>
+                        <h4>MQTT</h4>
+                        <p style="text-align: justify;">Protocolo ligero de mensajería que facilita la comunicación máquina a máquina (M2M), usado para enviar los datos desde la LilyGO hacia el servidor en la nube.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hardware Utilizado -->
+    <section id="hardware" class="hardware">
+        <div class="container">
+            <div class="section-title">
+                <h2>Hardware Utilizado</h2>
+            </div>
+            
+            <div class="hardware-grid">
+                <div class="hardware-card">
+                    <div class="hardware-img">
+                        <img src="Arduino Uno Rev3.jpeg" alt="Arduino Uno">
+                    </div>
+                    <div class="hardware-content">
+                        <h3>Arduino Uno Rev3</h3>
+                        <p>Placa de desarrollo basada en el microcontrolador ATmega328P, ampliamente utilizada en proyectos de electrónica y prototipos de IoT.</p>
+                        <ul>
+                            <li>Microcontrolador: ATmega328P</li>
+                            <li>Voltaje de operación: 5V</li>
+                            <li>Pines digitales de E/S: 14</li>
+                            <li>Entradas analógicas: 6</li>
+                            <li>Memoria Flash: 32KB</li>
+                        </ul>
+                        <a href="https://store.arduino.cc/products/arduino-uno-rev3" target="_blank">Más información <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="hardware-card">
+                    <div class="hardware-img">
+                        <img src="Heltec WiFi LoRa 32 V3.avif" alt="Heltec WiFi LoRa 32 V3">
+                    </div>
+                    <div class="hardware-content">
+                        <h3>Heltec WiFi LoRa 32 V3</h3>
+                        <p>Placa de desarrollo que combina conectividad Wi-Fi, Bluetooth y LoRa, basada en el microcontrolador ESP32-S3FN8.</p>
+                        <ul>
+                            <li>Chip LoRa: Semtech SX1262</li>
+                            <li>Frecuencia LoRa: 863-928MHz</li>
+                            <li>Potencia máxima de transmisión: 21dBm</li>
+                            <li>Pantalla OLED: 0.96" 128×64 píxeles</li>
+                            <li>Flash: 8MB</li>
+                        </ul>
+                        <a href="https://heltec.org/project/wifi-lora-32-v3/" target="_blank">Más información <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="hardware-card">
+                    <div class="hardware-img">
+                        <img src="LilyGO TTGO T-SIM7600G-H R2.jpg" alt="LilyGO TTGO T-SIM7600G-H R2">
+                    </div>
+                    <div class="hardware-content">
+                        <h3>LilyGO TTGO T-SIM7600G-H R2</h3>
+                        <p>Placa de desarrollo que integra conectividad 4G LTE, GPS, Wi-Fi y Bluetooth, basada en el microcontrolador ESP32-WROVER.</p>
+                        <ul>
+                            <li>Módem celular: SIM7600G-H (4G LTE)</li>
+                            <li>GPS: Soporte para múltiples constelaciones</li>
+                            <li>Flash: 16MB</li>
+                            <li>PSRAM: 8MB</li>
+                            <li>Soporte para batería 18650</li>
+                        </ul>
+                        <a href="https://lilygo.cc/products/t-sim7600" target="_blank">Más información <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sensores -->
+    <section id="sensores" class="container">
+        <div class="section-title">
+            <h2>Sensores Utilizados</h2>
+        </div>
+        
+        <div class="sensores">
+            <div class="sensor-tabs">
+                <button class="tab-btn active" data-tab="mq6">MQ-6 Gas LP</button>
+                <button class="tab-btn" data-tab="max6675">MAX6675 Termopar</button>
+                <button class="tab-btn" data-tab="presion">Sensor de Presión</button>
+            </div>
+            
+            <div id="mq6" class="tab-content active">
+                <div class="sensor-info">
+                    <div class="sensor-img">
+                        <img src="https://uelectronics.com/wp-content/uploads/2018/01/AR0222-Modulo-Detector-de-Gas-LP-MQ-6-V1.jpg" alt="Sensor MQ-6">
+                    </div>
+                    <div class="sensor-details">
+                        <h3>MQ-6 Detector de Gas LP</h3>
+                        <p>Sensor electro-químico que varía su resistencia al estar en contacto con el gas LP y gas metano/gas natural. El módulo contiene un circuito electrónico que permite realizar la conexión con alguna tarjeta de desarrollo, y cuenta con una salida analógica y otra digital.</p>
+                        <ul>
+                            <li><strong>Detección de:</strong> Gas LP, Iso-butano, Propano, Humo y Alcohol</li>
+                            <li><strong>Voltaje de operación:</strong> 5V</li>
+                            <li><strong>Rango de detección:</strong> 200 ppm a 10000 ppm</li>
+                            <li><strong>Tiempo de Respuesta:</strong> ≤ 10s</li>
+                            <li><strong>Temperatura de Operación:</strong> -20°C ~ 50°C</li>
+                        </ul>
+                        <a href="https://uelectronics.com/wp-content/uploads/2018/01/MQ-6.pdf" target="_blank" class="btn">Ver Datasheet</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="max6675" class="tab-content">
+                <div class="sensor-info">
+                    <div class="sensor-img">
+                        <img src="Módulo MAX6675 con Termopar Tipo K.jpg" alt="MAX6675 Termopar">
+                    </div>
+                    <div class="sensor-details">
+                        <h3>Módulo MAX6675 con Termopar Tipo K</h3>
+                        <p>Dispositivo que permite medir temperaturas muy altas utilizando un termopar tipo K. Este módulo se utiliza principalmente en aplicaciones donde se requieren temperaturas altas, como en hornos, impresoras 3D, o sistemas industriales.</p>
+                        <ul>
+                            <li><strong>Voltaje de operación:</strong> 3.0 a 5.5 V</li>
+                            <li><strong>Rango de temperatura:</strong> 0 a 1024°C</li>
+                            <li><strong>Precisión:</strong> ±2°C</li>
+                            <li><strong>Resolución:</strong> 0.25°C</li>
+                            <li><strong>Comunicación:</strong> SPI</li>
+                        </ul>
+                        <a href="https://cdn-shop.adafruit.com/datasheets/MAX6675.pdf" target="_blank" class="btn">Ver Datasheet</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="presion" class="tab-content">
+                <div class="sensor-info">
+                    <div class="sensor-img">
+                        <img src="Transductor de Presión.jpg" alt="Sensor de Presión">
+                    </div>
+                    <div class="sensor-details">
+                        <h3>Transductor de Presión</h3>
+                        <p>Dispositivo que convierte la presión de un fluido (gas, aceite, agua) en una señal eléctrica, generalmente proporcional a la magnitud de dicha presión. Diseñado para medir la presión en aplicaciones que involucren aceites, gases o agua.</p>
+                        <ul>
+                            <li><strong>Señal de Salida:</strong> 0.5V a 4.5V (analógica)</li>
+                            <li><strong>Rango de Medición:</strong> 0 psi hasta 100 psi o 150 psi</li>
+                            <li><strong>Voltaje de Operación:</strong> 5V DC</li>
+                            <li><strong>Precisión:</strong> ±0.5% a ±1.0%</li>
+                            <li><strong>Tiempo de Respuesta:</strong> 1 ms</li>
+                        </ul>
+                        <a href="https://www.mouser.com/catalog/specsheets/kavlico_p265_pressure_data_sheet.pdf" target="_blank" class="btn">Ver Datasheet</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Integrantes -->
+    <section id="integrantes" class="integrantes">
+        <div class="container">
+            <div class="section-title">
+                <h2>Integrantes</h2>
+            </div>
+            
+            <div class="equipo">
+                <div class="integrante">
+                    <div class="integrante-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>Portillo Calva Homero de Jesús</h3>
+                    <p>Desarrollo de Hardware</p>
+                </div>
+                
+                <div class="integrante">
+                    <div class="integrante-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>Chávez Arce Deker Abiel</h3>
+                    <p>Programación de Microcontroladores</p>
+                </div>
+                
+                <div class="integrante">
+                    <div class="integrante-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>Hernández Mendoza Iris María del Carmen</h3>
+                    <p>Diseño de Circuitos</p>
+                </div>
+                
+                <div class="integrante">
+                    <div class="integrante-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>Serrano García Luis Antonio</h3>
+                    <p>Desarrollo de Software</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Sobre el Proyecto</h3>
+                    <p>Sistema de detección de fugas de gas empleando tecnologías inalámbricas LoRa y 4G para prevenir accidentes en viviendas.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Enlaces Rápidos</h3>
+                    <ul>
+                        <li><a href="#problematica">Problemática</a></li>
+                        <li><a href="#objetivo">Objetivo</a></li>
+                        <li><a href="#justificacion">Justificación</a></li>
+                        <li><a href="#arquitectura">Arquitectura</a></li>
+                        <li><a href="#hardware">Hardware</a></li>
+                        <li><a href="#sensores">Sensores</a></li>
+                        <li><a href="historicos.html">Datos Históricos</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> contacto@gasalert.com</li>
+                        <li><i class="fas fa-phone"></i> +52 123 456 7890</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Mixquiahuala de Juárez, Hidalgo, México</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 GasAlert. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Funcionalidad de las pestañas de sensores
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remover clase active de todos los botones y contenidos
+                tabBtns.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Agregar clase active al botón clickeado
+                btn.classList.add('active');
+                
+                // Mostrar el contenido correspondiente
+                const tabId = btn.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Smooth scrolling para los enlaces del menú
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Animación al hacer scroll
+        const observerOptions = {
+            threshold: 0.1
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.etapa, .protocolo-card, .hardware-card, .integrante').forEach(element => {
+            observer.observe(element);
+        });
+    </script>
+</body>
+</html>

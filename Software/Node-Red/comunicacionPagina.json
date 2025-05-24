@@ -1,0 +1,136 @@
+[
+    {
+        "id": "07f5e7ff85b6d468",
+        "type": "tab",
+        "label": "Flow 3",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "eac66714fd3401f0",
+        "type": "websocket in",
+        "z": "07f5e7ff85b6d468",
+        "name": "",
+        "server": "",
+        "client": "0c8d7da5df433f14",
+        "x": 170,
+        "y": 200,
+        "wires": [
+            [
+                "165e1d03a0044478"
+            ]
+        ]
+    },
+    {
+        "id": "3ad084fbe8b6e902",
+        "type": "websocket out",
+        "z": "07f5e7ff85b6d468",
+        "name": "",
+        "server": "89f10429861f36d6",
+        "client": "",
+        "x": 560,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "4ec2e544cc774461",
+        "type": "mqtt in",
+        "z": "07f5e7ff85b6d468",
+        "name": "",
+        "topic": "GasHJ2",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "cd595de967ee59c0",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 60,
+        "y": 280,
+        "wires": [
+            [
+                "3ad084fbe8b6e902"
+            ]
+        ]
+    },
+    {
+        "id": "f661ce379f53c61a",
+        "type": "debug",
+        "z": "07f5e7ff85b6d468",
+        "name": "debug 3",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "165e1d03a0044478",
+        "type": "debug",
+        "z": "07f5e7ff85b6d468",
+        "name": "debug 4",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 320,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "0c8d7da5df433f14",
+        "type": "websocket-client",
+        "path": "ws://127.0.0.1:1880/data/test",
+        "tls": "",
+        "wholemsg": "false",
+        "hb": "0",
+        "subprotocol": "",
+        "headers": []
+    },
+    {
+        "id": "89f10429861f36d6",
+        "type": "websocket-listener",
+        "path": "/data/test",
+        "wholemsg": "false"
+    },
+    {
+        "id": "cd595de967ee59c0",
+        "type": "mqtt-broker",
+        "name": "HiveMQ",
+        "broker": "broker.hivemq.com",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    }
+]
