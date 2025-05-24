@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Monitoreo de Fugas de Gas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #f1f8e9);
+      color: #333;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 1.5rem;
+    }
+    .sensor {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    }
+    .sensor-label {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .sensor-value {
+      font-size: 1.4rem;
+      color: #00796b;
+    }
+    .alerta {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef9a9a;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+      font-weight: bold;
+      text-align: center;
+      display: none;
+    }
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .chart-container {
+      background: #fafafa;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+    @media (max-width: 768px) {
+      .charts {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Monitor de Gases en el Hogar</h1>
+
+    <div class="sensor">
+      <div class="sensor-label">Gas:</div>
+      <div class="sensor-value" id="gas">--</div>
+    </div>
+    <div class="sensor">
+      <div class="sensor-label">Presión:</div>
+      <div class="sensor-value" id="presion">--</div>
+    </div>
+    <div class="sensor">
+      <div class="sensor-label">Temperatura:</div>
+      <div class="sensor-value" id="temperatura">--</div>
+    </div>
+
+    <div class="alerta" id="alertaGas">🚨 ¡Nivel de gas peligroso detectado!</div>
+
+    <div class="charts">
+      <div class="chart-container">
+        <h3>Gas</h3>
+        <canvas id="gasChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Presión</h3>
+        <canvas id="presionChart"></canvas>
+      </div>
+      <div class="chart-container" style="display: flex; flex-direction: column; align-items: center;">
+        <h3>Temperatura</h3>
+        <canvas id="tempGauge" width="200" height="100"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const gasEl = document.getElementById("gas");
+    const presionEl = document.getElementById("presion");
+    const temperaturaEl = document.getElementById("temperatura");
+    const alertaGas = document.getElementById("alertaGas");
+
+    const maxPuntos = 20;
+    const tiempo = [];
+    const valoresGas = [];
+    const valoresPresion = [];
+
+    const gasCtx = document.getElementById("gasChart").getContext("2d");
+    const presionCtx = document.getElementById("presionChart").getContext("2d");
+    const tempCtx = document.getElementById("tempGauge").getContext("2d");
+
+    const gasChart = new Chart(gasCtx, {
+      type: 'line',
+      data: {
+        labels: tiempo,
+        datasets: [{
+          label: 'Gas (ppm)',
+          data: valoresGas,
+          borderColor: '#00796b',
+          tension: 0.3
+        }]
+      },
+      options: {
+        animation: false,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    const presionChart = new Chart(presionCtx, {
+      type: 'line',
+      data: {
+        labels: tiempo,
+        datasets: [{
+          label: 'Presión (kPa)',
+          data: valoresPresion,
+          borderColor: '#3f51b5',
+          tension: 0.3
+        }]
+      },
+      options: {
+        animation: false,
+        scales: { y: { beginAtZero: false } }
+      }
+    });
+
+    const tempGauge = new Chart(tempCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Temperatura', 'Restante'],
+        datasets: [{
+          label: 'Temperatura',
+          data: [0, 100],
+          backgroundColor: ['#ff9800', '#eeeeee'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        aspectRatio: 2,
+        rotation: -90,
+        circumference: 180,
+        cutout: '80%',
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false }
+        }
+      }
+    });
+
+    const ws = new WebSocket("ws://127.0.0.1:1880/data/test");
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const ts = new Date().toLocaleTimeString();
+
+      gasEl.textContent = data.gas;
+      presionEl.textContent = data.presion;
+      temperaturaEl.textContent = data.temperatura;
+
+      if (parseFloat(data.gas) > 50) {
+        alertaGas.style.display = "block";
+      } else {
+        alertaGas.style.display = "none";
+      }
+
+      // Actualizar gráficas lineales
+      tiempo.push(ts);
+      valoresGas.push(parseFloat(data.gas));
+      valoresPresion.push(parseFloat(data.presion));
+
+      if (tiempo.length > maxPuntos) {
+        tiempo.shift();
+        valoresGas.shift();
+        valoresPresion.shift();
+      }
+
+      gasChart.update();
+      presionChart.update();
+
+      // Actualizar gauge
+      const temp = parseFloat(data.temperatura);
+      tempGauge.data.datasets[0].data[0] = temp;
+      tempGauge.data.datasets[0].data[1] = 100 - temp;
+      tempGauge.update();
+    };
+
+    ws.onerror = (e) => {
+      console.error("Error de conexión WebSocket", e);
+    };
+  </script>
+</body>
+</html>

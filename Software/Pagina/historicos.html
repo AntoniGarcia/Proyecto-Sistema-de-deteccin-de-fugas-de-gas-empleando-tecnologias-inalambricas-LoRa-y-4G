@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico de 24 Horas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+    }
+    .charts-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .chart-box {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      color: #7f8c8d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Datos Históricos - Últimas 24 Horas</h1>
+    <div class="loading" id="loading">Cargando datos...</div>
+    <div class="charts-container" id="charts" style="display: none;">
+      <div class="chart-box">
+        <canvas id="gasHistoryChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <canvas id="presionHistoryChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <canvas id="tempHistoryChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Configuración común de gráficos
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      type: 'time',
+      time: {
+        unit: 'hour',
+        displayFormats: {
+          hour: 'HH:mm'
+        }
+      },
+      title: {
+        display: true,
+        text: 'Hora'
+      }
+    },
+    y: {
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: 'Valor'
+      }
+    }
+  },
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    zoom: {
+      zoom: {
+        wheel: {
+          enabled: true,
+        },
+        pinch: {
+          enabled: true
+        },
+        mode: 'x'
+      }
+    }
+  }
+};
+
+// Obtener datos del servidor
+async function cargarDatos() {
+  try {
+    const response = await fetch('/api/historicos');
+    const data = await response.json();
+    
+    // Procesar datos
+    const labels = data.map(item => new Date(item.timestamp));
+    const gasData = data.map(item => item.gas);
+    const presionData = data.map(item => item.presion);
+    const tempData = data.map(item => item.temperatura);
+
+    // Crear gráficos
+    crearGrafico('gasHistoryChart', 'Gas (ppm)', labels, gasData, '#e74c3c');
+    crearGrafico('presionHistoryChart', 'Presión (kPa)', labels, presionData, '#3498db');
+    crearGrafico('tempHistoryChart', 'Temperatura (°C)', labels, tempData, '#f1c40f');
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('charts').style.display = 'grid';
+    
+  } catch (error) {
+    console.error('Error al cargar datos:', error);
+    document.getElementById('loading').textContent = 'Error al cargar los datos';
+  }
+}
+
+function crearGrafico(canvasId, label, labels, data, color) {
+  new Chart(document.getElementById(canvasId), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: label,
+        data: data,
+        borderColor: color,
+        backgroundColor: color + '20',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 2
+      }]
+    },
+    options: chartOptions
+  });
+}
+
+// Cargar datos al iniciar
+cargarDatos();
+
+// Actualizar cada 5 minutos
+setInterval(cargarDatos, 300000);
+</script>
+</body>
+</html>
