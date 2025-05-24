@@ -1,0 +1,2 @@
+# Proyecto-Sistema-de-deteccin-de-fugas-de-gas-empleando-tecnologias-inalambricas-LoRa-y-4G
+Este proyecto tiene como objetivo la prevención de accidentes domésticos mediante la detección temprana de fugas de gas LP, reduciendo el riesgo de incendios o explosiones. El sistema emplea sensores ambientales y tecnologías de comunicación inalámbrica LoRa y 3G para la transmisión remota de datos en tiempo real hacia una plataforma de monitoreo.
